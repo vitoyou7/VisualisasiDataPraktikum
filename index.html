@@ -240,10 +240,10 @@ nav {
 #chart-race { height: 340px; }
 
 /* ── HEATMAP (Narasi 1) ── */
-#chart-heatmap { height: 340px; }
+#chart-heatmap { height: auto; min-height: 340px; }
 
 /* ── SOCIAL MEDIA (Narasi 2) ── */
-#chart-social { height: 360px; }
+#chart-social { height: auto; min-height: 360px; }
 #chart-social-time { height: 260px; }
 
 /* ── AGE (Narasi 3) ── */
@@ -834,34 +834,82 @@ function animateRace() {
 }
 
 function drawHeatmap() {
-  const data = getYearData(2023);
+  // True grid heatmap: years as columns, countries as rows
+  const years = [2000,2005,2010,2015,2019,2020,2021,2022,2023];
+  const countries = Object.keys(seaData);
   const el = document.getElementById('chart-heatmap');
-  const W = el.clientWidth || 420, H = 320;
-  const margin = {top:10, right:20, bottom:30, left:130};
-  const iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
+  const W = el.clientWidth || 420;
+  const margin = {top:30, right:20, bottom:60, left:130};
+  const cellH = 26;
+  const H = margin.top + countries.length * cellH + margin.bottom;
+  el.style.height = H + 'px';
 
   d3.select('#chart-heatmap svg').remove();
   const svg = d3.select('#chart-heatmap').append('svg').attr('width',W).attr('height',H);
-  const g = svg.append('g').attr('transform', `translate(100, 20)`);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
 
-  const x = d3.scaleLinear().domain([0,100]).range([0,iw]);
-  const y = d3.scaleBand().domain(data.map(d=>d.name)).range([0,ih]).padding(0.15);
-  const color = d3.scaleSequential(d3.interpolateBlues).domain([0,100]);
+  const iw = W - margin.left - margin.right;
+  const ih = countries.length * cellH;
 
-  g.append('g').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
-  g.selectAll('.tick text').attr('font-size','10').attr('fill','#555');
+  const xScale = d3.scaleBand().domain(years.map(String)).range([0, iw]).padding(0.05);
+  const yScale = d3.scaleBand().domain(countries).range([0, ih]).padding(0.05);
+  const color = d3.scaleSequential(d3.interpolateBlues).domain([0, 100]);
 
-  g.selectAll('rect').data(data).enter().append('rect')
-    .attr('y', d=>y(d.name)).attr('height',y.bandwidth()).attr('x',0)
-    .attr('width', d=>x(d.val)).attr('fill', d=>color(d.val)).attr('rx',3)
-    .on('mousemove',(e,d)=>showTip(e,`<b>${d.name}</b><br>2023: ${d.val.toFixed(1)}%`))
-    .on('mouseleave',hideTip);
+  // X axis (years)
+  g.append('g').call(d3.axisTop(xScale).tickSize(0))
+    .select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','9').attr('fill','#555');
 
-  g.selectAll('text.hv').data(data).enter().append('text').attr('class','hv')
-    .attr('x',d=>x(d.val)+4).attr('y',d=>y(d.name)+y.bandwidth()/2+4)
-    .attr('font-size','10').attr('fill','#333').text(d=>d.val.toFixed(1)+'%');
+  // Y axis (country names)
+  g.append('g').call(d3.axisLeft(yScale).tickSize(0))
+    .select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','9.5').attr('fill','#444');
 
-  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(5).tickFormat(d=>d+'%')).select('.domain').remove();
+  // Draw cells
+  countries.forEach(country => {
+    years.forEach(yr => {
+      const val = seaData[country][yr] ?? null;
+      if (val === null) return;
+      g.append('rect')
+        .attr('x', xScale(String(yr)))
+        .attr('y', yScale(country))
+        .attr('width', xScale.bandwidth())
+        .attr('height', yScale.bandwidth())
+        .attr('fill', color(val))
+        .attr('rx', 3)
+        .on('mousemove', (e) => showTip(e, `<b>${country}</b><br>${yr}: ${val.toFixed(1)}%`))
+        .on('mouseleave', hideTip);
+
+      // Value label inside cell (only if cell wide enough)
+      if (xScale.bandwidth() > 28) {
+        g.append('text')
+          .attr('x', xScale(String(yr)) + xScale.bandwidth()/2)
+          .attr('y', yScale(country) + yScale.bandwidth()/2 + 4)
+          .attr('text-anchor','middle')
+          .attr('font-size','8')
+          .attr('fill', val > 60 ? '#fff' : '#333')
+          .text(val.toFixed(0));
+      }
+    });
+  });
+
+  // Color legend bar at bottom
+  const legendW = Math.min(iw, 200);
+  const legendX = (iw - legendW) / 2;
+  const legendY = ih + 20;
+  const defs = svg.append('defs');
+  const grad = defs.append('linearGradient').attr('id','hm-grad').attr('x1','0%').attr('x2','100%');
+  grad.append('stop').attr('offset','0%').attr('stop-color', color(0));
+  grad.append('stop').attr('offset','50%').attr('stop-color', color(50));
+  grad.append('stop').attr('offset','100%').attr('stop-color', color(100));
+
+  const lgG = g.append('g').attr('transform',`translate(${legendX},${legendY})`);
+  lgG.append('rect').attr('width',legendW).attr('height',10).attr('rx',3)
+    .attr('fill','url(#hm-grad)');
+  lgG.append('text').attr('x',0).attr('y',22).attr('font-size','9').attr('fill','#666').text('0%');
+  lgG.append('text').attr('x',legendW/2).attr('y',22).attr('text-anchor','middle').attr('font-size','9').attr('fill','#666').text('50%');
+  lgG.append('text').attr('x',legendW).attr('y',22).attr('text-anchor','end').attr('font-size','9').attr('fill','#666').text('100%');
+  lgG.append('text').attr('x',legendW/2).attr('y',35).attr('text-anchor','middle').attr('font-size','9').attr('fill','#999').text('% Pengguna Internet');
 }
 
 // ═══════════════════════════════════════
@@ -882,51 +930,65 @@ function drawSocial() {
   const countries = ["Indonesia","Philippines","Vietnam","Thailand","Malaysia","Singapore"];
   const labels = {"Indonesia":"Indonesia","Philippines":"Filipina","Vietnam":"Vietnam","Thailand":"Thailand","Malaysia":"Malaysia","Singapore":"Singapura"};
 
-  // Kumpulkan semua platform unik
+  // Platform-specific colors (consistent per platform name)
+  const PLATFORM_COLORS = {
+    "Facebook":    "#1877F2",
+    "Instagram":   "#E1306C",
+    "WhatsApp":    "#25D366",
+    "TikTok":      "#010101",
+    "YouTube":     "#FF0000",
+    "Snapchat":    "#FFFC00",
+    "Pinterest":   "#E60023",
+    "Telegram":    "#0088CC",
+    "Threads":     "#101318",
+    "LinkedIn":    "#0A66C2",
+    "Twitter":     "#1DA1F2",
+    "X (Twitter)": "#1DA1F2",
+    "Reddit":      "#FF4500",
+    "WeChat":      "#07C160",
+    "Quora":       "#B92B27",
+    "Line":        "#00C300",
+  };
+  function getPlatColor(name) {
+    return PLATFORM_COLORS[name] || '#aaa';
+  }
+
+  // Collect all unique platforms across all countries
   const allPlatforms = [...new Set(countries.flatMap(c => (socialData[c]||[]).map(([p])=>p)))];
-  const pcols = ['#c8401b','#1b5c8a','#d4a843','#2a8a4a','#9b59b6'];
-
-  // Bentuk data: [{country, p0, p1, ...}]
-  const data = countries.map(c => {
-    const row = {country: c};
-    (socialData[c]||[]).forEach(([p,v], i) => { row[`p${i}`] = v; row[`label${i}`] = p; });
-    return row;
-  });
-
-  const keys = ['p0','p1','p2','p3','p4'];
 
   const el = document.getElementById('chart-social');
-  const W = el.clientWidth||420, H = 340;
-  const margin = {top:10, right:30, bottom:40, left:100};
+  const W = el.clientWidth||420;
+  // Extra height for legend
+  const legendRows = Math.ceil(allPlatforms.length / 3);
+  const H = 340 + legendRows * 22 + 16;
+  const margin = {top:10, right:30, bottom: legendRows * 22 + 30, left:100};
   const iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
 
   d3.select('#chart-social svg').remove();
   const svg = d3.select('#chart-social').append('svg').attr('width',W).attr('height',H);
   const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
 
-  const stack = d3.stack().keys(keys).value((d,k) => d[k]||0);
-  const series = stack(data);
-
-  const maxVal = d3.max(data, d => keys.reduce((s,k) => s+(d[k]||0), 0));
-  const x = d3.scaleLinear().domain([0, maxVal+1]).range([0, iw]);
   const y = d3.scaleBand().domain(countries).range([0, ih]).padding(0.25);
+  const maxVal = d3.max(countries, c => d3.sum((socialData[c]||[]).map(([,v])=>v)));
+  const x = d3.scaleLinear().domain([0, maxVal+1]).range([0, iw]);
 
-  // Bars
-  series.forEach((layer, i) => {
-    g.selectAll(`rect.s${i}`).data(layer).enter().append('rect')
-      .attr('class', `s${i}`)
-      .attr('y', d => y(d.data.country))
-      .attr('x', d => x(d[0]))
-      .attr('width', d => x(d[1]) - x(d[0]))
-      .attr('height', y.bandwidth())
-      .attr('fill', pcols[i])
-      .attr('rx', i===0 ? 4 : 0)
-      .on('mousemove', (e, d) => {
-        const platLabel = d.data[`label${i}`];
-        const val = d.data[`p${i}`]||0;
-        showTip(e, `<b>${platLabel}</b>`);
-      })
-      .on('mouseleave', hideTip);
+  // Draw stacked bars with platform-specific colors
+  countries.forEach(country => {
+    let xOffset = 0;
+    (socialData[country]||[]).forEach(([platform, val], i) => {
+      const bw = x(val);
+      g.append('rect')
+        .attr('y', y(country))
+        .attr('x', x(xOffset))
+        .attr('width', bw)
+        .attr('height', y.bandwidth())
+        .attr('fill', getPlatColor(platform))
+        .attr('rx', i===0 ? 4 : 0)
+        .attr('opacity', 0.92)
+        .on('mousemove', (e) => showTip(e, `<b>${platform}</b><br>${val} akun aktif`))
+        .on('mouseleave', hideTip);
+      xOffset += val;
+    });
   });
 
   // Axis Y
@@ -939,6 +1001,24 @@ function drawSocial() {
     .call(d3.axisBottom(x).ticks(5)).select('.domain').remove();
   g.selectAll('.tick text').attr('fill','rgba(255,255,255,0.4)');
 
+  // Legend at bottom — sorted alphabetically
+  const sortedPlatforms = [...allPlatforms].sort();
+  const itemW = Math.floor(iw / 3);
+  const legendStartY = ih + 36;
+  sortedPlatforms.forEach((plat, i) => {
+    const col = i % 3;
+    const row = Math.floor(i / 3);
+    const lx = col * itemW;
+    const ly = legendStartY + row * 22;
+    g.append('rect')
+      .attr('x', lx).attr('y', ly - 9)
+      .attr('width', 12).attr('height', 12).attr('rx', 2)
+      .attr('fill', getPlatColor(plat));
+    g.append('text')
+      .attr('x', lx + 16).attr('y', ly)
+      .attr('font-size','10').attr('fill','rgba(255,255,255,0.55)')
+      .text(plat);
+  });
 }
 
 function drawSocialTime() {
