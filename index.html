@@ -1070,7 +1070,6 @@ function drawAgeBar() {
   const x = d3.scaleBand().domain(ageData.map(d=>d.g)).range([0,iw]).padding(0.25);
   const y = d3.scaleLinear().domain([0,10]).range([ih,0]);
 
-  // const col = d3.scaleLinear().domain([7.5,9]).range(['#1b5c8a','#c8401b']);
   const col = () => "#1b5c8a";
 
   g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0)).select('.domain').remove();
@@ -1080,7 +1079,7 @@ function drawAgeBar() {
   g.selectAll('rect').data(ageData).enter().append('rect')
     .attr('x',d=>x(d.g)).attr('width',x.bandwidth())
     .attr('y',d=>y(d.total)).attr('height',d=>ih-y(d.total))
-    .attr('fill',d=>col(d.total)).attr('rx',4)
+    .attr('fill',col).attr('rx',4)
     .on('mousemove',(e,d)=>showTip(e,`<b>${d.g} tahun</b><br>Total: ${d.total}h/hari`))
     .on('mouseleave',hideTip);
 
