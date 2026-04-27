@@ -640,7 +640,7 @@ footer .member-tag {
   <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:rgba(255,255,255,0.7);margin-bottom:0.5rem">
     Dunia Digital Asia Tenggara
   </div>
-  <div>Laporan Data Visual · Statistika Sains Data 2 · 2024</div>
+  <div>Laporan Data Visual · Statistika Sains Data 2 · 2026</div>
   <div style="margin-top:0.5rem">
     <strong>Kelompok 5 · Kelas 3SD2</strong>
   </div>
@@ -792,7 +792,9 @@ function drawRace(year) {
     .attr('height', y.bandwidth())
     .attr('x', 0)
     .attr('width', d => x(d.val))
-    .attr('fill', d => d.name==='Indonesia' ? '#c8401b' : (COLORS[d.name]||'#aaa'))
+    // .attr('fill', d => d.name==='Indonesia' ? '#c8401b' : (COLORS[d.name]||'#aaa'))
+    // KODE BARU
+    .attr('fill', d => d.name === 'Indonesia' ? '#FF0000' : '#2ECC71')
     .attr('opacity', d => d.name==='Indonesia' ? 1 : 0.7)
     .attr('rx', 3)
     .on('mousemove', (e,d) => showTip(e, `<b>${d.name}</b><br>${d.val.toFixed(1)}% online (${year})`))
@@ -985,7 +987,7 @@ function drawSocial() {
         .attr('fill', getPlatColor(platform))
         .attr('rx', i===0 ? 4 : 0)
         .attr('opacity', 0.92)
-        .on('mousemove', (e) => showTip(e, `<b>${platform}</b><br>${val} akun aktif`))
+        .on('mousemove', (e) => showTip(e, `<b>${platform}</b><br>`))
         .on('mouseleave', hideTip);
       xOffset += val;
     });
@@ -1068,7 +1070,8 @@ function drawAgeBar() {
   const x = d3.scaleBand().domain(ageData.map(d=>d.g)).range([0,iw]).padding(0.25);
   const y = d3.scaleLinear().domain([0,10]).range([ih,0]);
 
-  const col = d3.scaleLinear().domain([7.5,9]).range(['#1b5c8a','#c8401b']);
+  // const col = d3.scaleLinear().domain([7.5,9]).range(['#1b5c8a','#c8401b']);
+  const col = () => "#1b5c8a";
 
   g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0)).select('.domain').remove();
   g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d=>d+'h')).select('.domain').remove();
