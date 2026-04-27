@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dunia Digital Asia Tenggara — Kelompok 5 3SD2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root {
+  --ink: #0d1117;
+  --paper: #f7f3ee;
+  --accent: #c8401b;
+  --accent2: #1b5c8a;
+  --gold: #d4a843;
+  --muted: #7a7268;
+  --card: #fff;
+  --border: rgba(0,0,0,0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,17,23,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 0 2rem;
+  height: 56px;
+  display: flex; align-items: center; gap: 0;
+}
+.nav-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.03em;
+  margin-right: auto;
+  text-decoration: none;
+}
+.nav-links {
+  display: flex; gap: 0; list-style: none;
+}
+.nav-links a {
+  display: block;
+  padding: 0 1rem;
+  height: 56px; line-height: 56px;
+  font-size: 0.78rem; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  transition: color 0.2s;
+  border-left: 1px solid rgba(255,255,255,0.07);
+}
+.nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+/* ── HERO ── */
+#beranda {
+  min-height: 100vh;
+  background: var(--ink);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding-top: 56px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-grid-bg {
+  position: absolute; inset: 56px 0 0 0;
+  background-image:
+    linear-gradient(rgba(212,168,67,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,67,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-content {
+  position: relative; z-index: 1;
+  max-width: 860px; margin: 0 auto;
+  padding: 7rem 2rem 4rem;
+  display: flex; flex-direction: column; gap: 1.5rem;
+}
+.hero-label {
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent);
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 900; line-height: 1.05;
+  color: #fff;
+}
+.hero-title em { color: var(--gold); font-style: italic; }
+.hero-desc {
+  font-size: 1.1rem; line-height: 1.75;
+  color: rgba(255,255,255,0.55);
+  max-width: 580px;
+}
+.hero-chapters {
+  display: flex; flex-wrap: wrap; gap: 0.75rem;
+  margin-top: 1rem;
+}
+.chapter-pill {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 2rem;
+  font-size: 0.8rem; font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.04);
+}
+.chapter-pill:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(212,168,67,0.08);
+}
+.chapter-pill span.num {
+  background: var(--accent);
+  color: #fff;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700;
+}
+.hero-stats {
+  display: flex; gap: 3rem; padding: 2rem 0;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.hero-stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem; font-weight: 900;
+  color: var(--gold);
+}
+.hero-stat-lbl { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 0.2rem; }
+.hero-scroll-hint {
+  text-align: center; padding: 2rem;
+  color: rgba(255,255,255,0.25);
+  font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+  animation: bounce 2s infinite;
+}
+@keyframes bounce {
+  0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)}
+}
+
+/* ── SECTION COMMONS ── */
+.section-wrapper {
+  padding: 5rem 2rem;
+  max-width: 1100px; margin: 0 auto;
+}
+.section-header {
+  display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items: start;
+  margin-bottom: 3rem;
+}
+.section-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 5rem; font-weight: 900;
+  line-height: 1; opacity: 0.06;
+  color: var(--ink);
+  user-select: none;
+}
+.section-meta {}
+.section-chapter {
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 700; line-height: 1.2;
+}
+.section-by {
+  font-size: 0.78rem; color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+/* alternating bg */
+.section-alt { background: #fff; }
+.section-dark { background: var(--ink); color: #fff; }
+.section-dark .section-num { color: #fff; }
+
+/* ── SCROLLY LAYOUT ── */
+.scrolly-layout {
+  display: grid; grid-template-columns: 2fr 1fr;
+  gap: 4rem; align-items: start;
+}
+.scrolly-layout > div {
+  min-width: 0;
+}
+.scrolly-text { position: sticky; top: 80px; }
+.scroll-step {
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  opacity: 0.35; transition: opacity 0.4s;
+}
+.scroll-step.active { opacity: 1; }
+.scroll-step h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem; font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.scroll-step p { font-size: 0.9rem; line-height: 1.75; color: var(--muted); }
+.section-dark .scroll-step p { color: rgba(255,255,255,0.55); }
+.section-dark .scroll-step { border-top-color: rgba(255,255,255,0.1); }
+
+/* ── CHARTS ── */
+.chart-container {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  overflow: hidden;
+  position: relative;
+}
+.section-dark .chart-container { background: #1a2030; }
+.chart-title {
+  font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+  padding: 1.2rem 1.5rem 0;
+}
+
+.chart-note {
+  font-size: 0.7rem; color: var(--muted);
+  padding: 0.5rem 1.5rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── BAR RACE (Narasi 1) ── */
+#chart-race { height: 340px; }
+
+/* ── HEATMAP (Narasi 1) ── */
+#chart-heatmap { height: 340px; }
+
+/* ── SOCIAL MEDIA (Narasi 2) ── */
+#chart-social { height: 360px; }
+#chart-social-time { height: 260px; }
+
+/* ── AGE (Narasi 3) ── */
+#chart-age-bar { height: 300px; }
+#chart-age-activity { height: 320px; }
+
+/* ── INDO (Narasi 4) ── */
+.big-number {
+  text-align: center; padding: 3rem 2rem;
+}
+.big-number .num {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(4rem, 10vw, 7rem);
+  font-weight: 900; color: var(--accent);
+  line-height: 1;
+}
+.big-number .label { font-size: 0.95rem; color: var(--muted); margin-top: 0.5rem; }
+#chart-indo-line { height: 280px; }
+#chart-indo-bar { height: 320px; }
+#chart-indo-gender { height: 240px; }
+
+/* ── INSIGHT CARDS ── */
+.insight-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+  margin-top: 2rem;
+}
+.insight-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-top: 3px solid var(--accent);
+}
+.insight-card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.insight-card p { font-size: 0.84rem; line-height: 1.65; color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  padding: 3rem 2rem;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+footer strong { color: var(--gold); }
+footer .members {
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  justify-content: center; margin-top: 1rem;
+}
+footer .member-tag {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 2rem; font-size: 0.75rem;
+  color: rgba(255,255,255,0.55);
+}
+
+/* ── TOOLTIP ── */
+.tooltip {
+  position: fixed; pointer-events: none;
+  background: rgba(13,17,23,0.92);
+  color: #fff; padding: 0.5rem 0.8rem;
+  border-radius: 6px; font-size: 0.78rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  z-index: 999; display: none;
+  max-width: 220px; line-height: 1.5;
+}
+
+/* ── LEGEND ── */
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; padding: 0 1.5rem 1rem; }
+.legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-line { width: 20px; height: 3px; flex-shrink: 0; border-radius: 2px; }
+
+/* filter buttons */
+.filter-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0 1.5rem 0.5rem; }
+.filter-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 2rem; border: 1px solid var(--border);
+  font-size: 0.74rem; font-weight: 500;
+  cursor: pointer; background: transparent;
+  transition: all 0.2s;
+}
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* progress bar on scroll */
+#reading-bar {
+  position: fixed; top: 56px; left: 0;
+  height: 2px; background: var(--accent);
+  width: 0%; z-index: 99;
+  transition: width 0.1s linear;
+}
+
+@media (max-width: 768px) {
+  .scrolly-layout { grid-template-columns: 1fr; }
+  .scrolly-text { position: static; }
+  .insight-grid { grid-template-columns: 1fr; }
+  .hero-stats { flex-wrap: wrap; gap: 1.5rem; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="reading-bar"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#beranda" class="nav-brand">Dunia Digital SEA</a>
+  <ul class="nav-links">
+    <li><a href="#beranda">Beranda</a></li>
+    <li><a href="#bab1">Penetrasi Internet</a></li>
+    <li><a href="#bab2">Media Sosial</a></li>
+    <li><a href="#bab3">Screen Time</a></li>
+    <li><a href="#bab4">Indonesia</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="beranda">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-content">
+    <div class="hero-label">Laporan Data Visual · 2026 · Kelompok 5 3SD2</div>
+    <h1 class="hero-title">
+      Horizon Digital SEA<br>
+      <em>Evolusi Internet SEA</em>
+    </h1>
+    <p class="hero-desc">
+      Evolusi internet terjadi begitu cepat, bahkan melampaui kemampuan kita untuk mencernanya. kini internet sudah menjadi bagian keseharian setiap orang, apalagi di SEA. Visualisasi ini menjelaskan bagaimana internet berkembang dan mengintervensi kehidupan kita.
+    </p>
+    <div class="hero-chapters">
+      <a href="#bab1" class="chapter-pill"><span class="num">1</span> Penetrasi Internet SEA</a>
+      <a href="#bab2" class="chapter-pill"><span class="num">2</span> Penguasa Media Sosial</a>
+      <a href="#bab3" class="chapter-pill"><span class="num">3</span> Screen Time per Usia</a>
+      <a href="#bab4" class="chapter-pill"><span class="num">4</span> Indonesia: Terhubung?</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val">11</div>
+        <div class="hero-stat-lbl">Negara Asia Tenggara</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">2000–2023</div>
+        <div class="hero-stat-lbl">Rentang Data</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">72,78%</div>
+        <div class="hero-stat-lbl">Penetrasi Internet Indonesia 2024</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">↓ Gulir untuk menjelajahi</div>
+</section>
+
+<!-- BAB 1: PENETRASI INTERNET (Narasi 1 - Arkan) -->
+<section id="bab1">
+<div class="section-wrapper">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-meta">
+      <div class="section-chapter">Bab 1 · Arkan</div>
+      <h2 class="section-title">Fajar Hingga Puncak<br>Era Digital Asia Tenggara</h2>
+      <div class="section-by">Data: World Bank · 2000–2023 · 11 Negara</div>
+    </div>
+  </div>
+
+  <div class="scrolly-layout">
+    <div>
+      <div class="chart-container">
+        <div class="chart-title">Penetrasi Internet (%) — Bar Chart Race 2000–2023</div>
+        <div class="filter-btns" id="race-controls">
+          <button class="filter-btn active" onclick="setYear(2000)">2000</button>
+          <button class="filter-btn" onclick="setYear(2010)">2010</button>
+          <button class="filter-btn" onclick="setYear(2019)">2019</button>
+          <button class="filter-btn" onclick="setYear(2023)">2023</button>
+          <button class="filter-btn" onclick="animateRace()" id="btn-animate">▶ Animasi</button>
+        </div>
+        <div id="chart-race"></div>
+        <div class="chart-note">Sumber: World Bank — IT.NET.USER.ZS · Sel kuning = estimasi</div>
+      </div>
+
+      <div class="chart-container" style="margin-top:1.5rem">
+        <div class="chart-title">Snapshot 2023 — Perbandingan Antar Negara</div>
+        <div id="chart-heatmap"></div>
+        <div class="chart-note">Brunei Darussalam mencapai 100% penetrasi di 2023</div>
+      </div>
+    </div>
+
+    <div class="scrolly-text" id="scrolly-1">
+      <div class="scroll-step active" data-year="2000">
+        <h3>Fajar Era Digital (2000-an)</h3>
+        <p>Pada awal milenium, internet masih menjadi barang mewah. Hanya Singapura dan Malaysia yang mencatatkan penetrasi di atas dua digit. Indonesia, Kamboja, dan Myanmar masih berada di bawah 1%—dunia digital Asia Tenggara baru saja bersiap untuk bangun.</p>
+      </div>
+      <div class="scroll-step" data-year="2010">
+        <h3>Ledakan Konektivitas (2010-an)</h3>
+        <p>Memasuki dekade 2010, pergerakan memanas. Penetrasi smartphone masif dan pembangunan infrastruktur jaringan mengubah peta. Indonesia mulai merangkak naik secara agresif—menunjukkan betapa cepatnya masyarakat beradaptasi dengan dunia maya.</p>
+      </div>
+      <div class="scroll-step" data-year="2019">
+        <h3>Menjelang Pandemi (2019)</h3>
+        <p>Sebelum pandemi melanda, kawasan Asia Tenggara sudah menunjukkan tren positif yang kuat. Singapura, Malaysia, dan Brunei sudah melampaui 80%. Indonesia menutup dekade ini dengan hampir 48% populasi online.</p>
+      </div>
+      <div class="scroll-step" data-year="2023">
+        <h3>Lompatan Paksa Era Pandemi (2020–2023)</h3>
+        <p>Pembatasan fisik memaksa kehidupan bermigrasi ke ruang virtual. Angka meroket tajam di seluruh kawasan. Brunei Darussalam mencapai 100%, Malaysia dan Singapura di atas 94%. Indonesia mengamankan posisi solid dengan 69%—pencapaian masif mengingat tantangan geografis kepulauannya.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- BAB 2: MEDIA SOSIAL (Narasi 2 - Ferdi) -->
+<section id="bab2" class="section-dark">
+<div class="section-wrapper">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-meta">
+      <div class="section-chapter">Bab 2 · Ferdi</div>
+      <h2 class="section-title" style="color:#fff">Siapa Penguasa<br>Media Sosial 2024?</h2>
+      <div class="section-by" style="color:rgba(255,255,255,0.4)">Data: Social Media Users Dataset · 11 Negara Asia Tenggara</div>
+    </div>
+  </div>
+
+  <div class="scrolly-layout">
+    <div>
+      <div class="chart-container">
+        <div class="chart-title" style="color:rgba(255,255,255,0.4)">Top 5 Platform per Negara — Asia Tenggara</div>
+        <div class="filter-btns" id="social-filter">
+          <button class="filter-btn active" data-country="Indonesia" onclick="setSocialCountry('Indonesia')">Indonesia</button>
+          <button class="filter-btn" data-country="Philippines" onclick="setSocialCountry('Philippines')">Filipina</button>
+          <button class="filter-btn" data-country="Vietnam" onclick="setSocialCountry('Vietnam')">Vietnam</button>
+          <button class="filter-btn" data-country="Thailand" onclick="setSocialCountry('Thailand')">Thailand</button>
+          <button class="filter-btn" data-country="Malaysia" onclick="setSocialCountry('Malaysia')">Malaysia</button>
+          <button class="filter-btn" data-country="Singapore" onclick="setSocialCountry('Singapore')">Singapura</button>
+        </div>
+        <div id="chart-social"></div>
+        <div class="chart-note" style="border-top-color:rgba(255,255,255,0.07);color:rgba(255,255,255,0.3)">Berdasarkan jumlah akun aktif dalam dataset</div>
+      </div>
+
+      <div class="chart-container" style="margin-top:1.5rem">
+        <div class="chart-title" style="color:rgba(255,255,255,0.4)">Rata-rata Waktu Harian per Platform (menit) — SEA</div>
+        <div id="chart-social-time"></div>
+      </div>
+    </div>
+
+    <div class="scrolly-text" id="scrolly-2">
+      <div class="scroll-step active" style="border-top-color:rgba(255,255,255,0.1)">
+        <h3 style="color:#fff">Dominasi Meta</h3>
+        <p>WhatsApp, Instagram, dan Facebook masih menjadi "pemilik" layar utama di hampir seluruh negara. Ekosistem Meta sulit digeser. Di Indonesia, Snapchat, Pinterest, Telegram, Threads, dan TikTok memimpin paket Top 5.</p>
+      </div>
+      <div class="scroll-step" style="border-top-color:rgba(255,255,255,0.1)">
+        <h3 style="color:#fff">Perang Video Pendek</h3>
+        <p>TikTok terus menempel ketat YouTube. Di Singapura, TikTok berada di posisi teratas dengan 7 akun aktif terbanyak. Di Vietnam dan Indonesia, platform ini masuk Top 5—menandakan dominasi video pendek di kalangan muda Asia Tenggara.</p>
+      </div>
+      <div class="scroll-step" style="border-top-color:rgba(255,255,255,0.1)">
+        <h3 style="color:#fff">Kebangkitan Komunitas</h3>
+        <p>Reddit dan Quora mulai menyodok naik di beberapa negara seperti Kamboja, Laos, dan Myanmar. Pengguna semakin haus akan konten berbasis diskusi dan pertukaran pengetahuan—bukan sekadar hiburan pasif.</p>
+      </div>
+      <div class="scroll-step" style="border-top-color:rgba(255,255,255,0.1)">
+        <h3 style="color:#fff">Snapchat Paling Menyita Waktu</h3>
+        <p>Dari sisi durasi penggunaan harian, Snapchat memimpin dengan rata-rata 165 menit/hari di kawasan SEA—melampaui WhatsApp (164 menit) dan Instagram. Platform dengan konten ephemeral justru paling "memakan" waktu penggunanya.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- BAB 3: SCREEN TIME (Narasi 3 - Mercy) -->
+<section id="bab3" class="section-alt">
+<div class="section-wrapper">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-meta">
+      <div class="section-chapter">Bab 3 · Mercy</div>
+      <h2 class="section-title">Hidup di Depan Layar:<br>Siapa yang Paling Lama?</h2>
+      <div class="section-by">Data: Daily Internet Usage by Age Group · 2024 · 1000+ Responden</div>
+    </div>
+  </div>
+
+  <div class="scrolly-layout">
+    <div>
+      <div class="chart-container">
+        <div class="chart-title">Total Screen Time Harian per Kelompok Usia (jam)</div>
+        <div id="chart-age-bar"></div>
+        <div class="chart-note">13–18 tahun mendominasi dengan rata-rata 8,9 jam/hari</div>
+      </div>
+
+      <div class="chart-container" style="margin-top:1.5rem">
+        <div class="chart-title">Komposisi Aktivitas Online per Kelompok Usia</div>
+        <div id="chart-age-activity"></div>
+        <div class="legend" id="age-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#c8401b"></div>Media Sosial</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#1b5c8a"></div>Kerja/Belajar</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#d4a843"></div>Hiburan</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scrolly-text" id="scrolly-3">
+      <div class="scroll-step active">
+        <h3>Generasi yang Selalu Terhubung</h3>
+        <p>Kelompok usia 13–18 tahun mendominasi dengan rata-rata 8,9 jam screen time per hari. Dari media sosial hingga streaming, aktivitas digital menjadi bagian tak terpisahkan. Dunia online bukan hanya ruang informasi—tetapi arena sosialisasi utama mereka.</p>
+      </div>
+      <div class="scroll-step">
+        <h3>Semakin Dewasa, Semakin Selektif</h3>
+        <p>Seiring bertambahnya usia, durasi screen time mulai menurun. Kelompok 60+ hanya menghabiskan rata-rata 7,6 jam—lebih sedikit dibanding remaja. Waktu digital mereka lebih terkendali, sering kali hanya untuk kebutuhan tertentu.</p>
+      </div>
+      <div class="scroll-step">
+        <h3>Tidak Hanya Seberapa Lama</h3>
+        <p>Yang lebih menarik adalah <em>bagaimana</em> waktu itu digunakan. Semua kelompok usia mendominasikan waktu untuk kerja/belajar—namun remaja mengalokasikan proporsi terbesar untuk media sosial dibanding kelompok lain.</p>
+      </div>
+      <div class="scroll-step">
+        <h3>Fungsi di Atas Hiburan</h3>
+        <p>Kelompok 36–45 dan 60+ cenderung lebih fungsional dalam penggunaan internet. Aktivitas seperti mencari informasi, bekerja, dan komunikasi menjadi prioritas—bukan sekadar scrolling tanpa tujuan. Satu internet, banyak cara penggunaan.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- BAB 4: INDONESIA (Narasi 4 - Difya) -->
+<section id="bab4">
+<div class="section-wrapper">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-meta">
+      <div class="section-chapter">Bab 4 · Difya</div>
+      <h2 class="section-title">Indonesia: Terhubung,<br>Tapi Harus Terkontrol</h2>
+      <div class="section-by">Data: BPS · Pengguna Internet Indonesia 2021–2024 · 38 Provinsi</div>
+    </div>
+  </div>
+
+  <!-- Big Number -->
+  <div class="big-number chart-container" style="margin-bottom:2rem">
+    <div class="num">72,78%</div>
+    <div class="label">Penduduk Indonesia terhubung internet pada 2024</div>
+    <div style="font-size:0.8rem;color:var(--muted);margin-top:1rem">
+      Dari hanya 0,9% di tahun 2000 → melonjak 80× dalam 24 tahun
+    </div>
+  </div>
+
+  <div class="scrolly-layout">
+    <div>
+      <div class="chart-container">
+        <div class="chart-title">Tren Pengguna Internet Indonesia 2021–2024 (%)</div>
+        <div id="chart-indo-line"></div>
+      </div>
+
+      <div class="chart-container" style="margin-top:1.5rem">
+        <div class="chart-title">Top 10 Provinsi — Penetrasi Internet 2024 (%)</div>
+        <div class="filter-btns">
+          <button class="filter-btn active" onclick="toggleProvinsi('top10')">Top 10</button>
+          <button class="filter-btn" onclick="toggleProvinsi('bottom10')">Terendah</button>
+        </div>
+        <div id="chart-indo-bar"></div>
+      </div>
+
+      <div class="chart-container" style="margin-top:1.5rem">
+        <div class="chart-title">Pengguna Internet per Gender 2024 (%)</div>
+        <div id="chart-indo-gender"></div>
+        <div class="chart-note">Perbedaan antara laki-laki dan perempuan sangat tipis</div>
+      </div>
+    </div>
+
+    <div class="scrolly-text" id="scrolly-4">
+      <div class="scroll-step active">
+        <h3>Pertumbuhan yang Tidak Terhenti</h3>
+        <p>Dari 62,1% (2021) ke 72,78% (2024)—Indonesia tumbuh konsisten hampir 3-4 poin persentase per tahun. Tren ini stabil dan naik, tanpa penurunan signifikan. Setiap tahun, puluhan juta warga baru pertama kali "online."</p>
+      </div>
+      <div class="scroll-step">
+        <h3>Tidak Semua Wilayah Sama</h3>
+        <p>Kepulauan Riau, DKI Jakarta, dan Kalimantan Timur memimpin penetrasi hingga mendekati 90%. Sementara Papua Pegunungan masih berada di 6,76%—kesenjangan digital yang mencerminkan tantangan infrastruktur yang nyata.</p>
+      </div>
+      <div class="scroll-step">
+        <h3>Tanpa Batas Gender</h3>
+        <p>Baik laki-laki maupun perempuan menunjukkan angka yang hampir setara. Internet telah menjadi ruang yang inklusif—potensi ketergantungan digital pun tidak terbatas pada satu kelompok saja.</p>
+      </div>
+      <div class="scroll-step">
+        <h3>Dari Akses ke Ketergantungan?</h3>
+        <p>Tingginya penetrasi dan tren peningkatan yang konsisten menunjukkan potensi intensitas penggunaan yang semakin tinggi. Internet memberikan banyak manfaat—namun di sinilah pentingnya kesadaran menggunakan teknologi secara bijak dan terkontrol.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insight Cards -->
+  <div class="insight-grid" style="margin-top:3rem">
+    <div class="insight-card">
+      <h4>🌐 Penetrasi Merata</h4>
+      <p>72,78% populasi Indonesia online di 2024. Dari nol koma persen di tahun 2000, pertumbuhan ini mencerminkan revolusi akses digital yang sesungguhnya.</p>
+    </div>
+    <div class="insight-card" style="border-top-color:var(--accent2)">
+      <h4>⚖️ Kesenjangan Wilayah</h4>
+      <p>Gap antara Kepulauan Riau (89%) dan Papua Pegunungan (6,76%) adalah pengingat bahwa pemerataan akses masih menjadi pekerjaan rumah besar Indonesia.</p>
+    </div>
+    <div class="insight-card" style="border-top-color:var(--gold)">
+      <h4>🎯 Tujuan Utama: Hiburan</h4>
+      <p>85,29% pengguna internet Indonesia menggunakannya untuk hiburan, diikuti media sosial (77,57%). Penggunaan produktif seperti belajar online masih di bawah 10%.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:rgba(255,255,255,0.7);margin-bottom:0.5rem">
+    Dunia Digital Asia Tenggara
+  </div>
+  <div>Laporan Data Visual · Statistika Sains Data 2 · 2024</div>
+  <div style="margin-top:0.5rem">
+    <strong>Kelompok 5 · Kelas 3SD2</strong>
+  </div>
+  <div class="members">
+    <span class="member-tag">Arkan — Narasi 1</span>
+    <span class="member-tag">Ferdi — Narasi 2</span>
+    <span class="member-tag">Mercy — Narasi 3</span>
+    <span class="member-tag">Difya — Narasi 4</span>
+  </div>
+  <div style="margin-top:1.5rem;font-size:0.72rem;opacity:0.4">
+    Sumber: World Bank · BPS Statistik Indonesia · Social Media Users Dataset · Daily Internet Usage Dataset
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const seaData = {
+  "Brunei Darussalam": {2000:9.0,2001:12.9,2002:15.3,2003:19.6,2004:29.7,2005:36.5,2006:42.2,2007:44.7,2008:46.0,2009:49.0,2010:53.0,2011:56.0,2012:60.3,2013:64.5,2014:68.8,2015:71.2,2016:90.0,2017:94.9,2018:95.0,2019:95.0,2020:95.1,2021:95.6,2022:99.0,2023:100.0},
+  "Cambodia": {2000:0.05,2001:0.08,2002:0.23,2003:0.26,2004:0.30,2005:0.32,2006:0.47,2007:0.49,2008:0.51,2009:0.53,2010:1.26,2011:3.10,2012:4.94,2013:6.0,2014:14.0,2015:6.4,2016:32.4,2017:32.9,2018:42.6,2019:52.3,2020:53.7,2021:55.6,2022:56.7,2023:57.9},
+  "Indonesia": {2000:0.93,2001:2.02,2002:2.13,2003:2.39,2004:2.60,2005:3.60,2006:4.76,2007:5.79,2008:7.92,2009:6.92,2010:10.92,2011:12.28,2012:14.52,2013:14.94,2014:17.14,2015:22.06,2016:25.45,2017:32.34,2018:39.90,2019:47.69,2020:53.73,2021:62.10,2022:66.48,2023:69.21},
+  "Laos": {2000:0.11,2001:0.18,2002:0.27,2003:0.33,2004:0.36,2005:0.85,2006:1.17,2007:1.64,2008:3.55,2009:6.0,2010:7.0,2011:9.0,2012:10.7,2013:12.5,2014:14.3,2015:18.2,2016:21.9,2017:25.5,2018:36.3,2019:47.0,2020:54.0,2021:62.0,2022:66.2,2023:70.3},
+  "Malaysia": {2000:21.4,2001:26.7,2002:32.3,2003:35.0,2004:42.3,2005:48.6,2006:51.6,2007:55.7,2008:55.8,2009:55.9,2010:56.3,2011:61.0,2012:65.8,2013:57.1,2014:63.7,2015:71.1,2016:78.8,2017:80.1,2018:81.2,2019:84.2,2020:89.6,2021:96.8,2022:97.4,2023:97.7},
+  "Myanmar": {2000:0.0,2001:0.0,2002:0.0,2003:0.02,2004:0.02,2005:0.07,2006:0.18,2007:0.22,2008:0.22,2009:0.22,2010:0.25,2011:0.98,2012:1.40,2013:1.80,2014:7.40,2015:10.9,2016:16.0,2017:23.6,2018:33.7,2019:48.1,2020:42.0,2021:44.0,2022:46.1,2023:48.2},
+  "Philippines": {2000:1.98,2001:2.52,2002:4.33,2003:4.86,2004:5.24,2005:5.40,2006:5.74,2007:5.97,2008:6.22,2009:9.0,2010:25.0,2011:29.0,2012:30.8,2013:32.7,2014:34.7,2015:36.9,2016:39.2,2017:41.6,2018:44.1,2019:43.0,2020:53.8,2021:63.4,2022:75.2,2023:87.0},
+  "Singapore": {2000:36.0,2001:41.7,2002:47.0,2003:53.8,2004:62.0,2005:61.0,2006:59.0,2007:69.9,2008:69.0,2009:69.0,2010:71.0,2011:71.0,2012:72.0,2013:80.9,2014:79.0,2015:79.0,2016:84.5,2017:84.5,2018:88.2,2019:88.9,2020:92.0,2021:96.9,2022:96.0,2023:94.3},
+  "Thailand": {2000:3.69,2001:5.56,2002:7.53,2003:9.30,2004:10.7,2005:15.0,2006:17.2,2007:20.0,2008:18.2,2009:20.1,2010:22.4,2011:23.7,2012:26.5,2013:28.9,2014:34.9,2015:39.3,2016:47.5,2017:52.9,2018:56.8,2019:66.7,2020:77.8,2021:85.3,2022:88.0,2023:89.5},
+  "Timor-Leste": {2000:0.0,2001:0.0,2002:0.0,2003:0.0,2004:0.0,2005:0.10,2006:0.50,2007:1.0,2008:1.5,2009:2.0,2010:3.0,2011:4.0,2012:7.0,2013:11.0,2014:17.5,2015:18.6,2016:21.2,2017:24.2,2018:27.6,2019:28.0,2020:32.0,2021:35.5,2022:40.8,2023:46.0},
+  "Vietnam": {2000:0.25,2001:1.27,2002:1.86,2003:3.78,2004:7.64,2005:12.7,2006:17.3,2007:20.8,2008:23.9,2009:26.6,2010:30.7,2011:35.1,2012:36.8,2013:38.5,2014:41.0,2015:45.0,2016:53.0,2017:58.1,2018:69.8,2019:68.7,2020:70.3,2021:74.2,2022:78.6,2023:78.1}
+};
+
+const COLORS = {
+  "Indonesia": "#c8401b",
+  "Singapore": "#1b5c8a",
+  "Malaysia": "#2a8a4a",
+  "Brunei Darussalam": "#9b59b6",
+  "Philippines": "#e67e22",
+  "Thailand": "#16a085",
+  "Vietnam": "#f39c12",
+  "Cambodia": "#8e44ad",
+  "Laos": "#2980b9",
+  "Myanmar": "#e74c3c",
+  "Timor-Leste": "#95a5a6"
+};
+
+const socialData = {
+  "Indonesia":   [["Snapchat",6],["Pinterest",5],["Telegram",5],["Threads",5],["TikTok",5]],
+  "Philippines": [["Instagram",7],["YouTube",5],["LinkedIn",4],["Snapchat",4],["WeChat",4]],
+  "Vietnam":     [["LinkedIn",6],["WhatsApp",6],["Facebook",5],["Threads",4],["TikTok",4]],
+  "Thailand":    [["Reddit",5],["YouTube",5],["Threads",4],["WhatsApp",4],["X (Twitter)",4]],
+  "Malaysia":    [["Telegram",6],["Threads",4],["Reddit",3],["WeChat",3],["WhatsApp",3]],
+  "Singapore":   [["TikTok",7],["Reddit",5],["WeChat",5],["Instagram",4],["Threads",4]]
+};
+
+const platformTime = [
+  {p:"Snapchat",t:164.9},{p:"WhatsApp",t:164.1},{p:"Quora",t:159.6},
+  {p:"Instagram",t:158.3},{p:"Facebook",t:155.9},{p:"X (Twitter)",t:154.5},
+  {p:"YouTube",t:153.1},{p:"WeChat",t:153.0},{p:"TikTok",t:152.7},
+  {p:"Threads",t:150.6},{p:"Pinterest",t:149.6},{p:"Telegram",t:148.3},
+  {p:"LinkedIn",t:147.6},{p:"Reddit",t:136.4}
+];
+
+const ageData = [
+  {g:"13–18", total:8.9, social:2.1, work:4.2, ent:2.0},
+  {g:"19–25", total:8.1, social:2.0, work:3.8, ent:1.9},
+  {g:"26–35", total:8.1, social:1.9, work:3.9, ent:1.9},
+  {g:"36–45", total:7.9, social:2.0, work:3.7, ent:1.9},
+  {g:"46–60", total:8.0, social:1.9, work:3.8, ent:1.9},
+  {g:"60+",   total:7.6, social:1.8, work:3.7, ent:1.8}
+];
+
+const indoTrend = [{y:2021,v:62.1},{y:2022,v:66.48},{y:2023,v:69.21},{y:2024,v:72.78}];
+
+const indoProvinsi = [
+  {p:"Kep. Riau",v:89.26,lk:51.21,pr:48.79},
+  {p:"DKI Jakarta",v:87.84,lk:50.16,pr:49.84},
+  {p:"Kalimantan Timur",v:84.44,lk:52.07,pr:47.93},
+  {p:"DI Yogyakarta",v:80.10,lk:50.89,pr:49.11},
+  {p:"Bali",v:77.56,lk:53.77,pr:46.23},
+  {p:"Riau",v:77.68,lk:52.58,pr:47.42},
+  {p:"Kalimantan Utara",v:77.44,lk:52.42,pr:47.58},
+  {p:"Banten",v:75.17,lk:53.02,pr:46.98},
+  {p:"Jawa Barat",v:76.62,lk:52.35,pr:47.65},
+  {p:"Sumatera Barat",v:74.59,lk:51.18,pr:48.82}
+].sort((a,b)=>b.v-a.v);
+
+const indoBottom = [
+  {p:"Papua Pegunungan",v:6.76},{p:"Papua Tengah",v:28.71},
+  {p:"Papua Selatan",v:48.44},{p:"Maluku",v:59.96},
+  {p:"Maluku Utara",v:59.17},{p:"Papua Barat",v:62.96},
+  {p:"NTT",v:54.84},{p:"Gorontalo",v:65.92},
+  {p:"Sulawesi Barat",v:66.61},{p:"Sulawesi Tengah",v:62.44}
+].sort((a,b)=>a.v-b.v);
+
+const indoGender = [
+  {cat:"Laki-laki", v:52.1},{cat:"Perempuan", v:47.9}
+];
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+const tip = document.getElementById('tooltip');
+function showTip(e, html) {
+  tip.innerHTML = html; tip.style.display = 'block';
+  moveTip(e);
+}
+function moveTip(e) {
+  tip.style.left = (e.clientX + 14) + 'px';
+  tip.style.top  = (e.clientY - 30) + 'px';
+}
+function hideTip() { tip.style.display = 'none'; }
+
+// ═══════════════════════════════════════
+// BAR RACE
+// ═══════════════════════════════════════
+let currentYear = 2000;
+let raceTimer = null;
+
+function getYearData(year) {
+  return Object.entries(seaData).map(([name, vals]) => ({
+    name, val: vals[year] || 0
+  })).sort((a,b) => b.val - a.val);
+}
+
+function drawRace(year) {
+  currentYear = year;
+  const data = getYearData(year);
+  const el = document.getElementById('chart-race');
+  const W = el.clientWidth || 420, H = 330;
+  const margin = {top:10, right:60, bottom:20, left:130};
+  const iw = W - margin.left - margin.right;
+  const ih = H - margin.top - margin.bottom;
+
+  d3.select('#chart-race svg').remove();
+  const svg = d3.select('#chart-race').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0,100]).range([0,iw]);
+  const y = d3.scaleBand().domain(data.map(d=>d.name)).range([0,ih]).padding(0.18);
+
+  g.append('g').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','10').attr('fill','#555');
+
+  g.selectAll('rect.bar')
+    .data(data).enter().append('rect')
+    .attr('class','bar')
+    .attr('y', d => y(d.name))
+    .attr('height', y.bandwidth())
+    .attr('x', 0)
+    .attr('width', d => x(d.val))
+    .attr('fill', d => d.name==='Indonesia' ? '#c8401b' : (COLORS[d.name]||'#aaa'))
+    .attr('opacity', d => d.name==='Indonesia' ? 1 : 0.7)
+    .attr('rx', 3)
+    .on('mousemove', (e,d) => showTip(e, `<b>${d.name}</b><br>${d.val.toFixed(1)}% online (${year})`))
+    .on('mouseleave', hideTip);
+
+  g.selectAll('text.val')
+    .data(data).enter().append('text')
+    .attr('class','val')
+    .attr('x', d => x(d.val) + 4)
+    .attr('y', d => y(d.name) + y.bandwidth()/2 + 4)
+    .attr('font-size','10').attr('fill','#333')
+    .text(d => d.val.toFixed(1)+'%');
+
+  // Year label
+  svg.append('text')
+    .attr('x', W - 10).attr('y', H - 10)
+    .attr('text-anchor','end').attr('font-size','28')
+    .attr('fill','rgba(0,0,0,0.08)').attr('font-weight','900')
+    .text(year);
+}
+
+function setYear(y) {
+  d3.select("#chart-race").selectAll("*").remove();
+  if(raceTimer) { clearInterval(raceTimer); raceTimer = null; document.getElementById('btn-animate').textContent = '▶ Animasi'; }
+  document.querySelectorAll('#race-controls .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.onclick && b.onclick.toString().includes(y));
+  });
+  drawRace(y);
+}
+
+function animateRace() {
+  if(raceTimer) { clearInterval(raceTimer); raceTimer=null; document.getElementById('btn-animate').textContent='▶ Animasi'; return; }
+  let y = 2000;
+  document.getElementById('btn-animate').textContent = '⏸ Pause';
+  raceTimer = setInterval(() => {
+    drawRace(y); y++;
+    if(y > 2023) { clearInterval(raceTimer); raceTimer=null; document.getElementById('btn-animate').textContent='▶ Animasi'; }
+  }, 500);
+}
+
+function drawHeatmap() {
+  const data = getYearData(2023);
+  const el = document.getElementById('chart-heatmap');
+  const W = el.clientWidth || 420, H = 320;
+  const margin = {top:10, right:20, bottom:30, left:130};
+  const iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
+
+  d3.select('#chart-heatmap svg').remove();
+  const svg = d3.select('#chart-heatmap').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform', `translate(100, 20)`);
+
+  const x = d3.scaleLinear().domain([0,100]).range([0,iw]);
+  const y = d3.scaleBand().domain(data.map(d=>d.name)).range([0,ih]).padding(0.15);
+  const color = d3.scaleSequential(d3.interpolateBlues).domain([0,100]);
+
+  g.append('g').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','10').attr('fill','#555');
+
+  g.selectAll('rect').data(data).enter().append('rect')
+    .attr('y', d=>y(d.name)).attr('height',y.bandwidth()).attr('x',0)
+    .attr('width', d=>x(d.val)).attr('fill', d=>color(d.val)).attr('rx',3)
+    .on('mousemove',(e,d)=>showTip(e,`<b>${d.name}</b><br>2023: ${d.val.toFixed(1)}%`))
+    .on('mouseleave',hideTip);
+
+  g.selectAll('text.hv').data(data).enter().append('text').attr('class','hv')
+    .attr('x',d=>x(d.val)+4).attr('y',d=>y(d.name)+y.bandwidth()/2+4)
+    .attr('font-size','10').attr('fill','#333').text(d=>d.val.toFixed(1)+'%');
+
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(5).tickFormat(d=>d+'%')).select('.domain').remove();
+}
+
+// ═══════════════════════════════════════
+// SOCIAL MEDIA
+// ═══════════════════════════════════════
+let curCountry = 'Indonesia';
+
+function setSocialCountry(c) {
+  d3.select("#chart-social").selectAll("*").remove();
+  curCountry = c;
+  document.querySelectorAll('#social-filter .filter-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.country===c);
+  });
+  drawSocial();
+}
+
+function drawSocial() {
+  const data = (socialData[curCountry]||[]).map(([p,v])=>({p,v}));
+  const el = document.getElementById('chart-social');
+  const W = el.clientWidth||420, H = 340;
+  const margin = {top:10,right:30,bottom:20,left:100};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  d3.select('#chart-social svg').remove();
+  const svg = d3.select('#chart-social').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0, d3.max(data,d=>d.v)+1]).range([0,iw]);
+  const y = d3.scaleBand().domain(data.map(d=>d.p)).range([0,ih]).padding(0.2);
+  const pcols = ['#c8401b','#1b5c8a','#d4a843','#2a8a4a','#9b59b6'];
+
+  g.append('g').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','11').attr('fill','rgba(255,255,255,0.6)');
+
+  g.selectAll('rect').data(data).enter().append('rect')
+    .attr('y',d=>y(d.p)).attr('height',y.bandwidth()).attr('x',0)
+    .attr('width',d=>x(d.v)).attr('fill',(d,i)=>pcols[i]).attr('rx',4)
+    .on('mousemove',(e,d)=>showTip(e,`<b>${d.p}</b><br>${curCountry}: ${d.v} akun aktif`))
+    .on('mouseleave',hideTip);
+
+  g.selectAll('text.sv').data(data).enter().append('text').attr('class','sv')
+    .attr('x',d=>x(d.v)+5).attr('y',d=>y(d.p)+y.bandwidth()/2+4)
+    .attr('font-size','12').attr('fill','rgba(255,255,255,0.7)').text(d=>d.v);
+
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(5)).select('.domain').remove();
+  g.selectAll('.tick line, .domain').attr('stroke','rgba(255,255,255,0.15)');
+  g.selectAll('.tick text').attr('fill','rgba(255,255,255,0.4)');
+}
+
+function drawSocialTime() {
+  const top8 = platformTime.slice(0,8);
+  const el = document.getElementById('chart-social-time');
+  const W = el.clientWidth||420, H = 240;
+  const margin = {top:10,right:50,bottom:20,left:100};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  d3.select('#chart-social-time svg').remove();
+  const svg = d3.select('#chart-social-time').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([130,170]).range([0,iw]);
+  const y = d3.scaleBand().domain(top8.map(d=>d.p)).range([0,ih]).padding(0.2);
+
+  g.append('g').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','10').attr('fill','rgba(255,255,255,0.5)');
+
+  g.selectAll('rect').data(top8).enter().append('rect')
+    .attr('y',d=>y(d.p)).attr('height',y.bandwidth()).attr('x',0)
+    .attr('width',d=>x(d.t)-x(130)).attr('fill','rgba(212,168,67,0.6)').attr('rx',3)
+    .on('mousemove',(e,d)=>showTip(e,`<b>${d.p}</b><br>${d.t} menit/hari`))
+    .on('mouseleave',hideTip);
+
+  g.selectAll('text.tv').data(top8).enter().append('text').attr('class','tv')
+    .attr('x',d=>x(d.t)-x(130)+4).attr('y',d=>y(d.p)+y.bandwidth()/2+4)
+    .attr('font-size','10').attr('fill','rgba(255,255,255,0.7)').text(d=>d.t+'m');
+
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(4).tickFormat(d=>d+'m')).select('.domain').remove();
+  g.selectAll('.tick text').attr('fill','rgba(255,255,255,0.35)');
+}
+
+// ═══════════════════════════════════════
+// AGE CHARTS
+// ═══════════════════════════════════════
+function drawAgeBar() {
+  const el = document.getElementById('chart-age-bar');
+  const W = el.clientWidth||420, H = 280;
+  const margin = {top:10,right:50,bottom:30,left:60};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  d3.select('#chart-age-bar svg').remove();
+  const svg = d3.select('#chart-age-bar').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleBand().domain(ageData.map(d=>d.g)).range([0,iw]).padding(0.25);
+  const y = d3.scaleLinear().domain([0,10]).range([ih,0]);
+
+  const col = d3.scaleLinear().domain([7.5,9]).range(['#1b5c8a','#c8401b']);
+
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0)).select('.domain').remove();
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d=>d+'h')).select('.domain').remove();
+  g.selectAll('line').attr('stroke','#eee');
+
+  g.selectAll('rect').data(ageData).enter().append('rect')
+    .attr('x',d=>x(d.g)).attr('width',x.bandwidth())
+    .attr('y',d=>y(d.total)).attr('height',d=>ih-y(d.total))
+    .attr('fill',d=>col(d.total)).attr('rx',4)
+    .on('mousemove',(e,d)=>showTip(e,`<b>${d.g} tahun</b><br>Total: ${d.total}h/hari`))
+    .on('mouseleave',hideTip);
+
+  g.selectAll('text.av').data(ageData).enter().append('text').attr('class','av')
+    .attr('x',d=>x(d.g)+x.bandwidth()/2).attr('y',d=>y(d.total)-5)
+    .attr('text-anchor','middle').attr('font-size','11').attr('font-weight','600')
+    .attr('fill','#333').text(d=>d.total+'h');
+}
+
+function drawAgeActivity() {
+  const el = document.getElementById('chart-age-activity');
+  const W = el.clientWidth||420, H = 300;
+  const margin = {top:10,right:20,bottom:30,left:60};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  d3.select('#chart-age-activity svg').remove();
+  const svg = d3.select('#chart-age-activity').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const keys = ['social','work','ent'];
+  const stack = d3.stack().keys(keys)(ageData);
+  const x = d3.scaleBand().domain(ageData.map(d=>d.g)).range([0,iw]).padding(0.25);
+  const y = d3.scaleLinear().domain([0,9.5]).range([ih,0]);
+  const colors = ['#c8401b','#1b5c8a','#d4a843'];
+
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0)).select('.domain').remove();
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d=>d+'h')).select('.domain').remove();
+
+  stack.forEach((layer,i) => {
+    g.selectAll(`rect.l${i}`).data(layer).enter().append('rect').attr('class',`l${i}`)
+      .attr('x',d=>x(d.data.g)).attr('width',x.bandwidth())
+      .attr('y',d=>y(d[1])).attr('height',d=>y(d[0])-y(d[1]))
+      .attr('fill',colors[i]).attr('opacity',0.85)
+      .on('mousemove',(e,d)=>{
+        const lbl = ['Media Sosial','Kerja/Belajar','Hiburan'][i];
+        const v = (d[1]-d[0]).toFixed(1);
+        showTip(e,`<b>${d.data.g} — ${lbl}</b><br>${v} jam/hari`);
+      })
+      .on('mouseleave',hideTip);
+  });
+}
+
+// ═══════════════════════════════════════
+// INDONESIA CHARTS
+// ═══════════════════════════════════════
+function drawIndoLine() {
+  const el = document.getElementById('chart-indo-line');
+  const W = el.clientWidth||420, H = 260;
+  const margin = {top:20,right:30,bottom:30,left:50};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  d3.select('#chart-indo-line svg').remove();
+  const svg = d3.select('#chart-indo-line').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([2021,2024]).range([0,iw]);
+  const y = d3.scaleLinear().domain([55,80]).range([ih,0]);
+
+  const line = d3.line().x(d=>x(d.y)).y(d=>y(d.v)).curve(d3.curveCatmullRom);
+  const area = d3.area().x(d=>x(d.y)).y0(ih).y1(d=>y(d.v)).curve(d3.curveCatmullRom);
+
+  g.append('path').datum(indoTrend).attr('fill','rgba(200,64,27,0.1)').attr('d',area);
+  g.append('path').datum(indoTrend).attr('fill','none').attr('stroke','#c8401b')
+    .attr('stroke-width',2.5).attr('d',line);
+
+  g.selectAll('circle').data(indoTrend).enter().append('circle')
+    .attr('cx',d=>x(d.y)).attr('cy',d=>y(d.v)).attr('r',5)
+    .attr('fill','#c8401b').attr('stroke','#fff').attr('stroke-width',2)
+    .on('mousemove',(e,d)=>showTip(e,`<b>${d.y}</b><br>${d.v}% penduduk online`))
+    .on('mouseleave',hideTip);
+
+  g.selectAll('text.pv').data(indoTrend).enter().append('text').attr('class','pv')
+    .attr('x',d=>x(d.y)).attr('y',d=>y(d.v)-12)
+    .attr('text-anchor','middle').attr('font-size','11').attr('font-weight','600')
+    .attr('fill','#c8401b').text(d=>d.v+'%');
+
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(4).tickFormat(d=>d)).select('.domain').remove();
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(d=>d+'%')).select('.domain').remove();
+}
+
+let showTop10 = true;
+function toggleProvinsi(mode) {
+  d3.select("#chart-indo-bar").selectAll("*").remove();
+  showTop10 = mode==='top10';
+  document.querySelectorAll('#bab4 .filter-btns .filter-btn').forEach((b,i)=>{
+    b.classList.toggle('active', (i===0&&showTop10)||(i===1&&!showTop10));
+  });
+  drawIndoBar();
+}
+
+function drawIndoBar() {
+  const raw = showTop10 ? indoProvinsi : indoBottom;
+  const data = showTop10 ? [...raw].sort((a,b)=>b.v-a.v) : [...raw].sort((a,b)=>a.v-b.v);
+  const el = document.getElementById('chart-indo-bar');
+  const W = el.clientWidth||420, H = 300;
+  const margin = {top:10,right:60,bottom:20,left:140};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  d3.select('#chart-indo-bar svg').remove();
+  const svg = d3.select('#chart-indo-bar').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0,100]).range([0,iw]);
+  const y = d3.scaleBand().domain(data.map(d=>d.p)).range([0,ih]).padding(0.18);
+  const colScale = d3.scaleSequential(d3.interpolateOranges).domain([0,100]);
+
+  g.append('g').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','9.5').attr('fill','#555');
+
+  g.selectAll('rect').data(data).enter().append('rect')
+    .attr('y',d=>y(d.p)).attr('height',y.bandwidth()).attr('x',0)
+    .attr('width',d=>x(d.v)).attr('fill',d=>colScale(d.v)).attr('rx',3)
+    .on('mousemove',(e,d)=>showTip(e,`<b>${d.p}</b><br>Penetrasi: ${d.v}%`))
+    .on('mouseleave',hideTip);
+
+  g.selectAll('text.bv').data(data).enter().append('text').attr('class','bv')
+    .attr('x',d=>x(d.v)+4).attr('y',d=>y(d.p)+y.bandwidth()/2+4)
+    .attr('font-size','10').attr('fill','#333').text(d=>d.v+'%');
+}
+
+function drawIndoGender() {
+  const el = document.getElementById('chart-indo-gender');
+  const W = el.clientWidth||420, H = 220;
+  const margin = {top:20,right:20,bottom:20,left:100};
+  const iw=W-margin.left-margin.right, ih=H-margin.top-margin.bottom;
+
+  // Stacked bars for gender across provinces (sample)
+  const gData = [
+    {p:"Nasional",lk:52.1,pr:47.9},
+    {p:"DKI Jakarta",lk:50.16,pr:49.84},
+    {p:"DI Yogyakarta",lk:50.89,pr:49.11},
+    {p:"Gorontalo",lk:49.10,pr:50.9},
+    {p:"Sulawesi Sel.",lk:50.08,pr:49.92}
+  ];
+
+  d3.select('#chart-indo-gender svg').remove();
+  const svg = d3.select('#chart-indo-gender').append('svg').attr('width',W).attr('height',H);
+  const g = svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0,100]).range([0,iw]);
+  const y = d3.scaleBand().domain(gData.map(d=>d.p)).range([0,ih]).padding(0.2);
+
+  g.append('g').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
+  g.selectAll('.tick text').attr('font-size','10').attr('fill','#555');
+
+  // male bars
+  g.selectAll('rect.lk').data(gData).enter().append('rect').attr('class','lk')
+    .attr('y',d=>y(d.p)).attr('height',y.bandwidth()).attr('x',0)
+    .attr('width',d=>x(d.lk)).attr('fill','#1b5c8a').attr('opacity',0.8).attr('rx',3);
+
+  // female bars
+  g.selectAll('rect.pr').data(gData).enter().append('rect').attr('class','pr')
+    .attr('y',d=>y(d.p)).attr('height',y.bandwidth()).attr('x',d=>x(d.lk))
+    .attr('width',d=>x(d.pr)).attr('fill','#c8401b').attr('opacity',0.8).attr('rx',3)
+    .on('mousemove',(e,d)=>showTip(e,`<b>${d.p}</b><br>Laki-laki: ${d.lk}%<br>Perempuan: ${d.pr}%`))
+    .on('mouseleave',hideTip);
+
+  g.selectAll('text.gv').data(gData).enter().append('text').attr('class','gv')
+    .attr('x',d=>x(d.lk)-22).attr('y',d=>y(d.p)+y.bandwidth()/2+4)
+    .attr('font-size','9').attr('fill','rgba(255,255,255,0.9)').text(d=>d.lk+'%');
+
+  // legend
+  svg.append('circle').attr('cx',margin.left).attr('cy',H-5).attr('r',5).attr('fill','#1b5c8a');
+  svg.append('text').attr('x',margin.left+10).attr('y',H-1).attr('font-size','10').attr('fill','#555').text('Laki-laki');
+  svg.append('circle').attr('cx',margin.left+80).attr('cy',H-5).attr('r',5).attr('fill','#c8401b');
+  svg.append('text').attr('x',margin.left+90).attr('y',H-1).attr('font-size','10').attr('fill','#555').text('Perempuan');
+}
+
+// ═══════════════════════════════════════
+// READING PROGRESS
+// ═══════════════════════════════════════
+window.addEventListener('scroll', () => {
+  const max = document.body.scrollHeight - window.innerHeight;
+  const pct = (window.scrollY / max) * 100;
+  document.getElementById('reading-bar').style.width = pct + '%';
+
+  // Nav active
+  const sections = ['beranda','bab1','bab2','bab3','bab4'];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const r = el.getBoundingClientRect();
+    const a = document.querySelector(`nav a[href="#${id}"]`);
+    if(a) a.classList.toggle('active', r.top <= 80 && r.bottom > 80);
+  });
+
+  // Scrolly steps
+  document.querySelectorAll('.scroll-step').forEach(step => {
+    const r = step.getBoundingClientRect();
+    const inView = r.top < window.innerHeight*0.6 && r.bottom > 0;
+    step.classList.toggle('active', inView);
+    if(inView && step.dataset.year) drawRace(parseInt(step.dataset.year));
+  });
+});
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  drawRace(2000);
+  drawHeatmap();
+  drawSocial();
+  drawSocialTime();
+  drawAgeBar();
+  drawAgeActivity();
+  drawIndoLine();
+  drawIndoBar();
+  drawIndoGender();
+});
+
+window.addEventListener('resize', () => {
+  drawRace(currentYear);
+  drawHeatmap();
+  drawSocial();
+  drawSocialTime();
+  drawAgeBar();
+  drawAgeActivity();
+  drawIndoLine();
+  drawIndoBar();
+  drawIndoGender();
+});
+</script>
+</body>
+</html>
